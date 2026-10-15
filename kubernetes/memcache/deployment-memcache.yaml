@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zammad-memcached
+  namespace: zammad
+  labels:
+    app: zammad-memcached
+
+spec:
+  replicas: 1
+
+  strategy:
+    type: Recreate
+
+  selector:
+    matchLabels:
+      app: zammad-memcached
+
+  template:
+    metadata:
+      labels:
+        app: zammad-memcached
+
+    spec:
+      containers:
+        - name: memcached
+          image: memcached:1.6.45-alpine
+          imagePullPolicy: IfNotPresent
+
+          command:
+            - memcached
+          args:
+            - "-m"
+            - "128"
+            - "-p"
+            - "11211"
+            - "-U"
+            - "0"
+
+          ports:
+            - name: memcached
+              containerPort: 11211
+              protocol: TCP
+
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 250m
+              memory: 192Mi
+
+          readinessProbe:
+            tcpSocket:
+              port: 11211
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            tcpSocket:
+              port: 11211
+            initialDelaySeconds: 15
+            periodSeconds: 20

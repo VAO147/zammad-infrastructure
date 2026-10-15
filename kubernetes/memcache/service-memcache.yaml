@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: zammad-memcached
+  namespace: zammad
+  labels:
+    app: zammad-memcached
+
+spec:
+  type: ClusterIP
+
+  selector:
+    app: zammad-memcached
+
+  ports:
+    - name: memcached
+      protocol: TCP
+      port: 11211
+      targetPort: 11211
