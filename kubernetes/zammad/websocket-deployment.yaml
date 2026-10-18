@@ -1,0 +1,72 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zammad-websocket
+  namespace: zammad
+
+spec:
+  replicas: 1
+
+  strategy:
+    type: Recreate
+
+  selector:
+    matchLabels:
+      app: zammad-websocket
+
+  template:
+    metadata:
+      labels:
+        app: zammad-websocket
+
+    spec:
+      containers:
+        - name: websocket
+          image: ghcr.io/zammad/zammad:7.2.2-0000
+          imagePullPolicy: IfNotPresent
+
+          command:
+            - zammad-websocket
+
+          ports:
+            - name: websocket
+              containerPort: 6042
+
+          envFrom:
+            - configMapRef:
+                name: zammad-config
+            - secretRef:
+                name: zammad-db-secret
+
+          volumeMounts:
+            - name: zammad-storage
+              mountPath: /opt/zammad/storage
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 768Mi
+
+          startupProbe:
+            tcpSocket:
+              port: 6042
+            periodSeconds: 10
+            failureThreshold: 30
+
+          readinessProbe:
+            tcpSocket:
+              port: 6042
+            periodSeconds: 15
+
+          livenessProbe:
+            tcpSocket:
+              port: 6042
+            periodSeconds: 30
+
+      volumes:
+        - name: zammad-storage
+          persistentVolumeClaim:
+            claimName: zammad-storage-pvc

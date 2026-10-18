@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: zammad-config
+  namespace: zammad
+
+data:
+  RAILS_ENV: "production"
+  TZ: "America/Sao_Paulo"
+
+  # PostgreSQL
+  POSTGRESQL_HOST: "zammad-postgresql"
+  POSTGRESQL_PORT: "5432"
+  POSTGRESQL_DB: "zammad_production"
+  POSTGRESQL_USER: "zammad"
+  POSTGRESQL_DB_CREATE: "false"
+
+  # Redis
+  REDIS_URL: "redis://zammad-redis:6379"
+
+  # Memcached
+  MEMCACHE_SERVERS: "zammad-memcached:11211"
+
+  # Elasticsearch desabilitado inicialmente
+  ELASTICSEARCH_ENABLED: "false"
+
+  # Serviços Zammad
+  ZAMMAD_RAILSSERVER_HOST: "zammad-railsserver"
+  ZAMMAD_RAILSSERVER_PORT: "3000"
+
+  ZAMMAD_WEBSOCKET_HOST: "zammad-websocket"
+  ZAMMAD_WEBSOCKET_PORT: "6042"
+
+  # Nginx
+  NGINX_PORT: "8080"
+  NGINX_CLIENT_MAX_BODY_SIZE: "50M"

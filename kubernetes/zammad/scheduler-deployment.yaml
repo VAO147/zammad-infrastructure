@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: zammad-scheduler
+  namespace: zammad
+
+spec:
+  replicas: 1
+
+  strategy:
+    type: Recreate
+
+  selector:
+    matchLabels:
+      app: zammad-scheduler
+
+  template:
+    metadata:
+      labels:
+        app: zammad-scheduler
+
+    spec:
+      containers:
+        - name: scheduler
+          image: ghcr.io/zammad/zammad:7.2.2-0000
+          imagePullPolicy: IfNotPresent
+
+          command:
+            - zammad-scheduler
+
+          envFrom:
+            - configMapRef:
+                name: zammad-config
+            - secretRef:
+                name: zammad-db-secret
+
+          volumeMounts:
+            - name: zammad-storage
+              mountPath: /opt/zammad/storage
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 384Mi
+            limits:
+              cpu: "1"
+              memory: 1024Mi
+
+      volumes:
+        - name: zammad-storage
+          persistentVolumeClaim:
+            claimName: zammad-storage-pvc
